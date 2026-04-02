@@ -25,9 +25,19 @@ Help me understand how to use it. Be ready to explain concepts, give examples, o
     )}`
 }
 
+function openAsMarkdown(content: string) {
+    const blob = new Blob([content], { type: "text/markdown" })
+    window.open(URL.createObjectURL(blob), "_blank")
+}
+
 const menuItems = {
-    markdown: (url: string) => (
-        <a href={`${url}.md`} target="_blank" rel="noopener noreferrer">
+    markdown: (_url: string, onOpen?: () => void) => (
+        <a
+            href="#"
+            onClick={(e) => {
+                e.preventDefault()
+                onOpen?.()
+            }}>
             <svg strokeLinejoin="round" viewBox="0 0 22 16">
                 <path
                     fillRule="evenodd"
@@ -125,7 +135,12 @@ export function DocsCopyPage({ page, url }: { page: string; url: string }) {
                     <DropdownMenuContent align="end" className="shadow-none">
                         {Object.entries(menuItems).map(([key, value]) => (
                             <DropdownMenuItem key={key} asChild>
-                                {value(url)}
+                                {value(
+                                    url,
+                                    key === "markdown"
+                                        ? () => openAsMarkdown(page)
+                                        : undefined
+                                )}
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>
@@ -141,7 +156,12 @@ export function DocsCopyPage({ page, url }: { page: string; url: string }) {
                             asChild
                             key={key}
                             className="*:[svg]:text-muted-foreground w-full justify-start text-base font-normal">
-                            {value(url)}
+                            {value(
+                                url,
+                                key === "markdown"
+                                    ? () => openAsMarkdown(page)
+                                    : undefined
+                            )}
                         </Button>
                     ))}
                 </PopoverContent>
